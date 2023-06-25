@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 from .module import *
-from .multi_task import *
+from .model import *
 
 
 AVAILABLE_MODULES = (

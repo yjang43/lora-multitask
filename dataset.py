@@ -5,6 +5,7 @@ Much of the code is modified from stanford alpaca.
 import os
 import copy
 import json
+from typing import Dict, List
 
 import torch
 import transformers
@@ -17,7 +18,10 @@ DEFAULT_BOS_TOKEN = "<s>"
 DEFAULT_UNK_TOKEN = "<unk>"
 
 
-def check_for_special_tokens(tokenizer, model):
+def check_for_special_tokens(
+        tokenizer: transformers.AutoTokenizer,
+        model: transformers.AutoModelForCausalLM
+):
     # NOTE: Realized special tokens trained during finetune
     # NOTE: will not be maintained when applying LoRA as these special tokens
     # NOTE: are by default missing in the pretrained model
@@ -81,11 +85,14 @@ def _tokenize_fn(strings, tokenizer: transformers.PreTrainedTokenizer):
 
 
 def preprocess(
-    sources,
-    targets,
+    sources: List[str],
+    targets: List[str],
     tokenizer: transformers.PreTrainedTokenizer,
-):
-    """Preprocess the data by tokenizing."""
+) -> Dict[str, torch.Tensor]:
+    """Preprocess the data by tokenizing.
+    TODO
+    """
+
     examples = [s + t for s, t in zip(sources, targets)]
     examples_tokenized, sources_tokenized = [_tokenize_fn(strings, tokenizer) for strings in (examples, sources)]
     input_ids = examples_tokenized["input_ids"]
@@ -100,6 +107,9 @@ class SupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
     def __init__(self, data_path: str, tokenizer: transformers.PreTrainedTokenizer, prompt: str):
+        """TODO
+        """
+
         super().__init__()
         
         if ".json" != os.path.splitext(data_path)[1]:
@@ -128,6 +138,9 @@ class DataCollatorForSupervisedDataset:
     """Collate examples for supervised fine-tuning."""
 
     def __init__(self, tokenizer):
+        """TODO
+        """
+
         self.tokenizer = tokenizer
 
     def __call__(self, instances):

@@ -22,7 +22,7 @@ def set_seed(seed):
 
 # TODO: DEBUG LOAD FROM CHECKPOINT FEATURE!
 
-# args
+
 def load_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument(

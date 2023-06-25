@@ -1,10 +1,12 @@
-""" LoRA finetuning util """
+"""LoRA finetuning util"""
 
 from typing import (
     Dict,
     List,
+    Tuple,
 )
 
+import transformers
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -18,16 +20,14 @@ REQUIRED_KEYS = (
     "lora_scaling",
 )
 
-def _validate_checkpoint(checkpoint):
-    if set(checkpoint.keys()).issuperset(set(REQUIRED_KEYS)):
-        raise ValueError("checkpoint does not have required keys within.")
-
 def initialize_finetuning(
-        model: nn.Module,
+        model: transformers.AutoModelForCausalLM,
         module_names: List[str],
         r: int = 4
-) -> Dict[str, torch.Tensor]:
-    
+) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
+    """TODO
+    """
+
     lora_parameter, lora_scaling = {}, {}
     for module_name in module_names:
         module = model.get_submodule(module_name)
@@ -55,14 +55,24 @@ def initialize_finetuning(
 
     return lora_parameter, lora_scaling
 
-def save_finetuning_checkpoint(checkpoint, chekcpoint_path, device="cpu"):
+def save_finetuning_checkpoint(checkpoint: Dict, chekcpoint_path: str, device="cpu"):
+    """TODO
+    """
+
     _validate_checkpoint(checkpoint)
     for key in checkpoint:
         if isinstance(checkpoint[key], torch.Tensor):
             checkpoint[key].to(device)
     torch.save(checkpoint, chekcpoint_path)
 
-def load_finetuning_checkpoint(checkpoint_path, device="cpu"):
+def load_finetuning_checkpoint(checkpoint_path: str, device="cpu") -> Dict:
+    """TODO
+    """
+
     checkpoint = torch.load(checkpoint_path, map_location=device)
     _validate_checkpoint(checkpoint)
     return checkpoint
+
+def _validate_checkpoint(checkpoint):
+    if set(checkpoint.keys()).issuperset(set(REQUIRED_KEYS)):
+        raise ValueError("checkpoint does not have required keys within.")

@@ -1,4 +1,4 @@
-""" LoRA core module implementation """
+"""LoRA core module implementation"""
 
 import math
 import torch
@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# https://github.com/microsoft/LoRA/blob/main/loralib/layers.py
+# Modified from: https://github.com/microsoft/LoRA/blob/main/loralib/layers.py
 class Linear(nn.Linear):
     def __init__(
         self, 
@@ -16,6 +16,9 @@ class Linear(nn.Linear):
         lora_alpha: int = 1,
         **kwargs
     ):
+        """TODO
+        """
+
         super().__init__(in_features, out_features, **kwargs)
 
         if not r > 0:
@@ -29,7 +32,7 @@ class Linear(nn.Linear):
         # Freezing the pre-trained weight matrix
         self.weight.requires_grad = False
 
-        self.reset_lora_parameters()
+        self._reset_lora_parameters()
 
     @classmethod
     def from_module(
@@ -38,6 +41,9 @@ class Linear(nn.Linear):
         r: int = 4,
         lora_alpha: int = 1
     ):
+        """TODO
+        """
+
         if not isinstance(module, nn.Linear):
             raise ValueError("Module should be an instance of nn.Linear.")
         in_features = module.in_features
@@ -48,7 +54,7 @@ class Linear(nn.Linear):
         return linear
 
 
-    def reset_lora_parameters(self):
+    def _reset_lora_parameters(self):
         # Initialize A the same way as the default for nn.Linear and B to zero.
         nn.init.kaiming_uniform_(self.lora_a, a=math.sqrt(5))
         nn.init.zeros_(self.lora_b)
