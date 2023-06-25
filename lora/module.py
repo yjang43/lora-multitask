@@ -8,6 +8,8 @@ import torch.nn.functional as F
 
 # Modified from: https://github.com/microsoft/LoRA/blob/main/loralib/layers.py
 class Linear(nn.Linear):
+    """LoRA linear module implementation."""
+
     def __init__(
         self, 
         in_features: int, 
@@ -16,7 +18,14 @@ class Linear(nn.Linear):
         lora_alpha: int = 1,
         **kwargs
     ):
-        """TODO
+        """Initializes LoRA linear module.
+        
+        Args:
+            in_features: Dimension of input
+            out_features: Dimension of output
+            r: LoRA rank
+            lora_alpha: Scale factor.
+            **kwargs: Additional setting for PyTorch lienar module.
         """
 
         super().__init__(in_features, out_features, **kwargs)
@@ -41,7 +50,14 @@ class Linear(nn.Linear):
         r: int = 4,
         lora_alpha: int = 1
     ):
-        """TODO
+        """Construct LoRA linear module from torch linear module.
+
+        Args:
+            module: PyTorch linear module.
+            r: LoRA rank
+            lora_alpha: Scale factor.
+        Returns:
+            linear: RoLA applied linear module.
         """
 
         if not isinstance(module, nn.Linear):
@@ -60,6 +76,13 @@ class Linear(nn.Linear):
         nn.init.zeros_(self.lora_b)
 
     def forward(self, x: torch.Tensor):
+        """Forward pass of LoRA linear module.
+
+        Args:
+            x: Input.
+        Returns:
+            result: Output.
+        """
 
         result = F.linear(x, self.weight, bias=self.bias)
         result += (x @ self.lora_a.transpose(0, 1) @ self.lora_b.transpose(0, 1)) * self.scaling

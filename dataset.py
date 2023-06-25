@@ -89,9 +89,7 @@ def preprocess(
     targets: List[str],
     tokenizer: transformers.PreTrainedTokenizer,
 ) -> Dict[str, torch.Tensor]:
-    """Preprocess the data by tokenizing.
-    TODO
-    """
+    """Preprocess the data by tokenizing."""
 
     examples = [s + t for s, t in zip(sources, targets)]
     examples_tokenized, sources_tokenized = [_tokenize_fn(strings, tokenizer) for strings in (examples, sources)]
@@ -107,8 +105,6 @@ class SupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""
 
     def __init__(self, data_path: str, tokenizer: transformers.PreTrainedTokenizer, prompt: str):
-        """TODO
-        """
 
         super().__init__()
         
@@ -138,8 +134,6 @@ class DataCollatorForSupervisedDataset:
     """Collate examples for supervised fine-tuning."""
 
     def __init__(self, tokenizer):
-        """TODO
-        """
 
         self.tokenizer = tokenizer
 

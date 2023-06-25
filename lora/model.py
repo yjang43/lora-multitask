@@ -12,6 +12,26 @@ import torch.nn as nn
 
 
 class MultiTaskModel(nn.Module):
+    """Multi-task model that injects LoRA dynamically. The model is initialized 
+    with pretrained model. When the function, generate_response, is called, 
+    LoRA checkpoint for the specified downstream task will be applied and generate 
+    the response accordingly. The checkpoint mapper that maps a downstream task 
+    to a checkpoint path is required. In the format of the following:
+
+    ```
+    # downstream_mapper.json
+    {
+        "question_answering": "path_to_the_checkpoint",
+        "summary": "path_to_the_checkpoint",
+        ...
+    }
+    ```
+
+    Then, for example, a user can generate a summary of an article by calling
+    a function `article_summary = generate_response("summary", article)`.
+    To reduce the IO bottleneck, LoRA checkpoints are cached once called,
+    so generating a response for the same downstream task will be faster.
+    """
 
     def __init__(
             self,
@@ -19,8 +39,11 @@ class MultiTaskModel(nn.Module):
             checkpoint_mapper_path: str,
             device: str = "cpu"
         ):
-        """TODO
-        specify files needed and clear instruction
+        """
+        Args:
+            model_name_or_path: Name or path of huggingface pretrained model.
+            checkpoint_mapper_path: Path to a file that maps downstream to checkpoint.
+            device: A device to load tensor (cuda, mps, cpu)
         """
 
         super().__init__()
@@ -45,7 +68,15 @@ class MultiTaskModel(nn.Module):
             input: str = "",
             **generation_kwargs
         ) -> str:
-        """TODO
+        """Generate response suitable for the downstrea task specified.
+
+        Args:
+            downstream: Downstream task ID.
+            instruction: Instruction given to the model.
+            input: Input given to the model.
+            **generation_kwargs: Extra options for generation config.
+        Returns:
+            generated_response: Response generated.
         """
 
         if downstream not in self._checkpoint_mapper:
@@ -72,7 +103,13 @@ class MultiTaskModel(nn.Module):
 
     @contextlib.contextmanager
     def apply_downstream(self, downstream_checkpoint: Dict) -> transformers.AutoModelForCausalLM:
-        """TODO
+        """Apply checkpoint LoRA on pretrained model weight.
+
+        Args:
+            downstream_checkoint: 
+                Downstream checkpoint containing lora_parameter, lora_scaling, and prompt_format.
+        Yields:
+            downstream_model: LoRA applied model.
         """
 
         lora_parameters = downstream_checkpoint["lora_parameters"]

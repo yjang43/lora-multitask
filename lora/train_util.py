@@ -25,7 +25,12 @@ def initialize_finetuning(
         module_names: List[str],
         r: int = 4
 ) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
-    """TODO
+    """Initializes a model by injecting LoRA modules to specified module names.
+
+    Args:
+        model: Pretrained huggingface model.
+        module_names: Names of moudles of the pretrained model to inject LoRA.
+        r: LoRA rank.
     """
 
     lora_parameter, lora_scaling = {}, {}
@@ -56,7 +61,13 @@ def initialize_finetuning(
     return lora_parameter, lora_scaling
 
 def save_finetuning_checkpoint(checkpoint: Dict, chekcpoint_path: str, device="cpu"):
-    """TODO
+    """Save a checkpoint that contains snapshot of LoRA finetune process.
+    
+    Args:
+        checkpoint: Checkpoint.
+        checkpoint_path: Path to save checkpoint.
+        Device: Device to memory map tensor objects into. Recommended to set 
+            device equal to device used for inference
     """
 
     _validate_checkpoint(checkpoint)
@@ -66,7 +77,10 @@ def save_finetuning_checkpoint(checkpoint: Dict, chekcpoint_path: str, device="c
     torch.save(checkpoint, chekcpoint_path)
 
 def load_finetuning_checkpoint(checkpoint_path: str, device="cpu") -> Dict:
-    """TODO
+    """Load LoRA checkpoint.
+    Args:
+        checkpoint_path: Path to load a checkpoint from.
+        device: Device to memory map tensor objects into.
     """
 
     checkpoint = torch.load(checkpoint_path, map_location=device)
