@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as dutil
 
-import dataset
+import dataset as ft_dataset
 import lora
 import lora.train_util
 
@@ -115,7 +115,7 @@ def _validate_target_modules(target_module_names, model: nn.Module):
             raise ValueError(f"{type(module)} is not available for LoRA.")
 
 def _load_dataloader(data_path, tokenizer, prompt_format, batch_size, collate_fn, shuffle):
-    dataset = dataset.SupervisedDataset(data_path, tokenizer, prompt_format)
+    dataset = ft_dataset.SupervisedDataset(data_path, tokenizer, prompt_format)
     dataloader = dutil.DataLoader(
         dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=shuffle)
     return dataloader
@@ -170,10 +170,10 @@ def finetune(args, evaluate=False):
         args.model_name_or_path, local_files_only=True)
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         args.model_name_or_path, local_files_only=True)
-    dataset.check_for_special_tokens(tokenizer, model)
+    ft_dataset.check_for_special_tokens(tokenizer, model)
 
     prompt_format = _load_prompt_format(args.prompt_format_path)
-    collator = dataset.DataCollatorForSupervisedDataset(tokenizer)
+    collator = ft_dataset.DataCollatorForSupervisedDataset(tokenizer)
     train_dataloader = _load_dataloader(
         args.train_data_path, tokenizer, prompt_format,
         batch_size=args.batch_size, collate_fn=collator, shuffle=True)
